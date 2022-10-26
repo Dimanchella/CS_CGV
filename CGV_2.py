@@ -69,7 +69,7 @@ def save_values(
     counter = 0
     for i, j in it.product(range(1, num_points_x + 1), range(1, num_points_y + 1)):
         counter += 1
-        saving_data.append((counter, i + 1, j + 1, xsl[i], ysl[j], fsl[j][i]))
+        saving_data.append((counter, i, j, xsl[i], ysl[j], fsl[j][i]))
         if counter == NUMBER_SAVED_INNER_POINTS:
             break
     with open("output.csv", "w+", newline='') as csv_file:
