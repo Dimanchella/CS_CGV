@@ -3,6 +3,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools as it
+import random as rand
 import json
 import csv
 
@@ -10,6 +11,7 @@ ERROR_CODE = -1
 
 PLOT_STEPS_X = 55
 PLOT_STEPS_Y = 55
+NUMBER_SAVED_RANDOM_INNER_POINTS = 5
 NUMBER_SAVED_INNER_POINTS = 20
 
 
@@ -56,9 +58,30 @@ def save_values(
                    ("outer pts =", num_outer_p),
                    ("inner pts =", num_inner_p),
                    ("accuracy =", accuracy), (),
+                   ("random points",),
                    ("N", "i", "j", "x[i]", "y[i]", "f[i][j]")]
     num_points_x: int
     num_points_y: int
+    if NUMBER_SAVED_RANDOM_INNER_POINTS < 1:
+        num_points_x = 1
+        num_points_y = 1
+    else:
+        num_points_x = int(math.sqrt(NUMBER_SAVED_RANDOM_INNER_POINTS))
+        num_points_y = math.ceil(NUMBER_SAVED_RANDOM_INNER_POINTS / num_points_x)
+
+    counter = 0
+    for _, _ in it.product(range(1, num_points_x + 1), range(1, num_points_y + 1)):
+        counter += 1
+        i = rand.randint(0, u_save - 1)
+        j = rand.randint(0, v_save - 1)
+        saving_data.append((counter, i, j, xsl[i], ysl[j], fsl[j][i]))
+        if counter == NUMBER_SAVED_RANDOM_INNER_POINTS:
+            break
+
+    saving_data.extend(
+        [(), ("inner neighboring points",),
+         ("N", "i", "j", "x[i]", "y[i]", "f[i][j]")])
+
     if NUMBER_SAVED_INNER_POINTS < 1:
         num_points_x = len(xsl) - 1
         num_points_y = len(ysl) - 1
