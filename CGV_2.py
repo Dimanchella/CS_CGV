@@ -95,7 +95,7 @@ def save_values(
         saving_data.append((counter, i, j, xsl[i], ysl[j], fsl[j][i]))
         if counter == NUMBER_SAVED_INNER_POINTS:
             break
-    with open("output.csv", "w+", newline='') as csv_file:
+    with open("output2.csv", "w+", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=";")
         writer.writerows(saving_data)
 
@@ -129,17 +129,12 @@ def show_plot(xsl: list[float], ysl: list[float], fsl: list[list[float]]):
 
     x3d, y3d = np.meshgrid(xsl, ysl)
     f3d = np.array(fsl)
-    # max_v = max(map(max, f3d))
-    # min_v = min(map(min, f3d))
-    # aver = sum(map(sum, f3d)) / (len(xsl) * len(ysl))
-    # lim_f = max(math.fabs(min_v - aver), math.fabs(max_v - aver)) * 1.5
     ax = fig.add_subplot(1, 2, 2, projection="3d")
     ax.plot_surface(x3d, y3d, f3d, cmap="gray", linewidth=0, antialiased=False)
     ax.set_facecolor("lightgray")
     ax.set_xlabel(r"$x_i$")
     ax.set_ylabel(r"$y_j$")
     ax.set_zlabel(r"$f_{i,j}$")
-    # ax.set_zlim(aver - lim_f, aver + lim_f)
 
     plt.subplots_adjust(left=0.05, bottom=0.1, right=0.95, top=0.9)
     plt.show()
