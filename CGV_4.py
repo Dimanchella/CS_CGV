@@ -106,60 +106,48 @@ if __name__ == '__main__':
 
     save_data.append(tuple())
     save_data.append(("ind","r2", "pl2", "pm2"))
-    last_p2_prime = ()
     ind = 1
     for ss in generate_symmetrical_primes(pc2):
-        # save_data.append((ss[0], ss[1], ss[2]))
-        last_p2_prime = (ind, ss[0], ss[1], ss[2])
+        save_data.append((ss[0], ss[1], ss[2]))
         # print(f"{ind}: r2 = {ss[0]} pl2 = {ss[1]} pm2 = {ss[2]}")
         ind += 1
-        # if ind > LIMIT_NUMBERS:
-        #     break
-    save_data.append(last_p2_prime)
+        if ind > LIMIT_NUMBERS:
+            break
+
     save_data.append(tuple())
     save_data.append(("ind", "r2", "pl2", "ml", "pm2", "mm"))
-    last_p2 = tuple()
     ind = 1
-    # for ss in generate_symmetrical_mut_primes(pc2):
-    #     str_ml = '+'.join(map(lambda m: f"{m[0]}^{m[1]}", ss[2].items()))
-    #     str_mm = '+'.join(map(lambda m: f"{m[0]}^{m[1]}", ss[4].items()))
-    #     # save_data.append((ind, ss[0], ss[1], str_ml, ss[3], str_mm))
-    #     last_p2 = (ss[0], ss[1], str_ml, ss[3], str_mm)
-    #     # print(f"{ind}: r2 = {ss[0]} pl2 = {ss[1]} ml: {str_ml} pm2 = {ss[3]} mm: {str_mm}")
-    #     ind += 1
-    #     # if ind > LIMIT_NUMBERS:
-    #     #     break
-    save_data.append(last_p2)
+    for ss in generate_symmetrical_mut_primes(pc2):
+        str_ml = '+'.join(map(lambda m: f"{m[0]}^{m[1]}", ss[2].items()))
+        str_mm = '+'.join(map(lambda m: f"{m[0]}^{m[1]}", ss[4].items()))
+        save_data.append((ind, ss[0], ss[1], str_ml, ss[3], str_mm))
+        # print(f"{ind}: r2 = {ss[0]} pl2 = {ss[1]} ml: {str_ml} pm2 = {ss[3]} mm: {str_mm}")
+        ind += 1
+        if ind > LIMIT_NUMBERS:
+            break
 
     save_data.append(tuple())
     save_data.append(("ind", "r3", "pl3", "pm3"))
-    last_p3_prime = ()
     ind = 1
     for ss in generate_symmetrical_primes(pc3):
-        # save_data.append((ss[0], ss[1], ss[2]))
-        last_p3_prime = (ind, ss[0], ss[1], ss[2])
+        save_data.append((ss[0], ss[1], ss[2]))
         # print(f"{ind}: r3 = {ss[0]} pl3 = {ss[1]} pm3 = {ss[2]}")
         ind += 1
-        # if ind > LIMIT_NUMBERS:
-        #     break
-    save_data.append(last_p3_prime)
+        if ind > LIMIT_NUMBERS:
+            break
+
     save_data.append(tuple())
     save_data.append(("ind", "r3", "pl3", "ml", "pm3", "mm"))
-    prelast_p3 = ()
-    last_p3 = ()
     ind = 1
     for ss in generate_symmetrical_mut_primes(pc3):
         str_ml = '+'.join(map(lambda m: f"{m[0]}^{m[1]}", ss[2].items()))
         str_mm = '+'.join(map(lambda m: f"{m[0]}^{m[1]}", ss[4].items()))
-        # save_data.append((ss[0], ss[1], str_ml, ss[3], str_mm))
-        prelast_p3 = last_p3
-        last_p3 = (ind, ss[0], ss[1], str_ml, ss[3], str_mm)
+        save_data.append((ss[0], ss[1], str_ml, ss[3], str_mm))
         # print(f"{ind}: r3 = {ss[0]} pl3 = {ss[1]} ml: {str_ml} pm3 = {ss[3]} mm: {str_mm}")
         ind += 1
-        # if ind > LIMIT_NUMBERS:
-        #     break
-    save_data.append(prelast_p3)
-    save_data.append(last_p3)
+        if ind > LIMIT_NUMBERS:
+            break
+
     with open("output4-3.csv", "w+", newline='') as csv_file:
         writer = csv.writer(csv_file, delimiter=";")
         writer.writerows(save_data)
