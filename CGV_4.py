@@ -229,8 +229,8 @@ if __name__ == '__main__':
         sys.exit(ERROR_CODE)
     pc2 = pow(2, 12 + n) if n <= 6 else pow(2, 25 - n)
     pc3 = pow(3, 7 + ns) if (ns := (n + mm + dd) % 7) > 3 else pow(3, 13 - ns)
-    pc2 = pow(2, 25)
-    pc3 = pow(3, 13)
+    # pc2 = pow(2, 25)
+    # pc3 = pow(3, 13)
 
     print(f"PROCES                                  |{'-' * (PROGRESS_BAR_LENGTH - 2)}|"
           "\nSearch for prime numbers                ", end='')
