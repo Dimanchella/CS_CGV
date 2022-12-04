@@ -12,7 +12,7 @@ ERROR_CODE = -1
 NUMBER_SUBPROCESSES = 4
 
 LIMIT_OUTPUT_PAIRS = 20
-LIMIT_MUTUALLY_PRIMES = 7
+LIMIT_MUTUALLY_PRIMES = 6
 
 
 def download_prime_numbers():
@@ -328,7 +328,7 @@ if __name__ == '__main__':
         sys.exit(ERROR_CODE)
     pc2 = pow(2, 12 + n) if n <= 6 else pow(2, 25 - n)
     pc3 = pow(3, 7 + ns) if (ns := (n + mm + dd) % 7) > 3 else pow(3, 13 - ns)
-    # pc2 = pow(2, 25)
+    # pc2 = pow(2, 24)
     # pc3 = pow(3, 13)
     limit_primes = collect_prime_numbers(max(pc2, pc3) * 2)
     # t = datetime.now()
@@ -354,7 +354,7 @@ if __name__ == '__main__':
     save_results(
         pc2, result_dict["pc2_pp"][0], result_dict["pc2_mpp"][0],
         result_dict["pc2_pp"][1], result_dict["pc2_mpp"][1], result_dict["pc2_mpn"],
-        pc2, result_dict["pc3_pp"][0], result_dict["pc3_mpp"][0],
+        pc3, result_dict["pc3_pp"][0], result_dict["pc3_mpp"][0],
         result_dict["pc3_pp"][1], result_dict["pc3_mpp"][1], result_dict["pc3_mpn"]
     )
 
