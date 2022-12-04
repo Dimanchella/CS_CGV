@@ -6,7 +6,6 @@ from copy import copy
 from functools import reduce
 from itertools import combinations
 from multiprocessing import Process, Manager, current_process
-from datetime import datetime
 
 ERROR_CODE = -1
 
