@@ -48,7 +48,8 @@ def save_values(
         d_save: int, a_save: float, b_save: float, c_save: float,
         hx_save: float, hy_save: float, u_save: int, v_save: int,
         num_outer_p: int, num_inner_p: int, accuracy: float,
-        xsl: list[float], ysl: list[float], fsl: list[float]):
+        xsl: list[float], ysl: list[float], fsl: list[float]
+):
     saving_data = [("A =", al_save, "", "d =", d_save),
                    ("B =", bl_save, "", "a =", a_save),
                    ("kx =", kx_save, "", "b =", b_save),
