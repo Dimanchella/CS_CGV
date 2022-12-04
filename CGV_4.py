@@ -9,7 +9,7 @@ from multiprocessing import Process, Manager, current_process
 
 ERROR_CODE = -1
 
-NUMBER_SUBTHREADS = 4
+NUMBER_SUBPROCESSES = 4
 
 LIMIT_OUTPUT_PAIRS = 20
 LIMIT_MUTUALLY_PRIMES = 7
@@ -205,10 +205,10 @@ def calculate_pairs(pc: int, primes_list: list[int], output_key: str, output_dic
     manager = Manager()
     sub_prime_pairs = manager.list()
     sub_mut_prime_pairs = manager.list()
-    part_pc = (pc - 2) // NUMBER_SUBTHREADS
-    add_parts = (pc - 2) % NUMBER_SUBTHREADS
+    part_pc = (pc - 2) // NUMBER_SUBPROCESSES
+    add_parts = (pc - 2) % NUMBER_SUBPROCESSES
     start_deff = 1
-    for i in range(NUMBER_SUBTHREADS):
+    for i in range(NUMBER_SUBPROCESSES):
         end_deff = start_deff + part_pc
         if add_parts > 0:
             add_parts -= 1
