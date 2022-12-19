@@ -96,9 +96,13 @@ def save_values(
         saving_data.append((counter, i, j, xsl[i], ysl[j], fsl[j][i]))
         if counter == NUMBER_SAVED_INNER_POINTS:
             break
-    with open("output2.csv", "w+", newline='') as csv_file:
-        writer = csv.writer(csv_file, delimiter=";")
-        writer.writerows(saving_data)
+    try:
+        with open("output2.csv", "w+", newline='') as csv_file:
+            writer = csv.writer(csv_file, delimiter=";")
+            writer.writerows(saving_data)
+    except PermissionError as perm:
+        print(f"Доступ к файлу output4.csv запрещён.\n{perm}")
+        sys.exit(ERROR_CODE)
 
 
 def show_plot(xsl: list[float], ysl: list[float], fsl: list[list[float]]):
@@ -153,7 +157,8 @@ if __name__ == '__main__':
             dd = reading_data["DD"]
             mm = reading_data["MM"]
             yyyy = reading_data["YYYY"]
-    except ValueError:
+    except FileNotFoundError as fnf:
+        print(f"Файл input.json не найден.\n{fnf}")
         sys.exit(ERROR_CODE)
 
     A = (mm * 100 + dd) / 12
