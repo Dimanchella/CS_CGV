@@ -6,13 +6,14 @@ from copy import copy
 from functools import reduce
 from itertools import combinations
 from multiprocessing import Process, Manager, current_process
+# from threading import Thread, current_thread
 
 ERROR_CODE = -1
 
 NUMBER_SUBPROCESSES = 4
 
 LIMIT_OUTPUT_PAIRS = 20
-LIMIT_MUTUALLY_PRIMES = 6
+LIMIT_SELECTED_MUTUALLY_PRIMES = 3
 
 
 def download_prime_numbers():
@@ -92,8 +93,9 @@ def is_mutually_prime(*nums: int):
 
 
 def calculate_prime_pairs(arr_pairs: list, primes_list: list[int], output_list: list):
-    primes_set = set(primes_list)
+    # print(f"{current_thread().name} start")
     print(f"{current_process().name} start")
+    primes_set = set(primes_list)
     prime_pairs = list(
         filter(
             lambda p: is_prime(p[1], primes_set) and is_prime(p[3], primes_set),
@@ -101,13 +103,16 @@ def calculate_prime_pairs(arr_pairs: list, primes_list: list[int], output_list: 
         )
     )
     output_list.append(prime_pairs)
+    # print(f"{current_thread().name} start")
     print(f"{current_process().name} end")
 
 
 def calculate_mut_prime_pairs(arr_pairs: list, output_list: list):
+    # print(f"{current_thread().name} start")
     print(f"{current_process().name} start")
     mut_prime_pairs = list(filter(lambda p: is_mutually_prime(*(p[1:4])), arr_pairs))
     output_list.append(mut_prime_pairs)
+    # print(f"{current_thread().name} start")
     print(f"{current_process().name} end")
 
 
@@ -146,7 +151,12 @@ def collect_prime_pairs(prime_pairs: list, limit: int, take_last=True):
     return prime_limited
 
 
-def collect_mut_prime_pairs(mut_prime_pairs: list, primes_list: list[int], limit: int, take_last=True):
+def collect_mut_prime_pairs(
+        mut_prime_pairs: list,
+        primes_list: list[int],
+        limit: int,
+        take_last=True
+):
     mut_prime_limited: list
     if 0 <= limit < len(mut_prime_pairs):
         mut_prime_limited = list(
@@ -179,16 +189,12 @@ def collect_mut_prime_pairs(mut_prime_pairs: list, primes_list: list[int], limit
 
 def collect_mut_prime_nums(mut_prime_pairs: list, primes_list: list[int], limit: int):
     mut_prime_list = [mut_prime_pairs[0][2]] if len(mut_prime_pairs) and limit > 0 else []
-    limit -= 1
     for pair in mut_prime_pairs:
         if limit <= 0:
             break
-        if is_mutually_prime(*(mut_prime_list + [pair[1]])):
-            mut_prime_list.append(pair[1])
+        if is_mutually_prime(*([pair[1]] + mut_prime_list + [pair[3]])):
+            mut_prime_list.extend([pair[1], pair[3]])
             limit -= 1
-            if limit > 0 and is_mutually_prime(*(mut_prime_list + [pair[3]])):
-                mut_prime_list.append(pair[3])
-                limit -= 1
     mut_prime_list = list(
         map(
             lambda number, ind: (ind, number, find_prime_multipliers(number, primes_list)),
@@ -201,10 +207,13 @@ def collect_mut_prime_nums(mut_prime_pairs: list, primes_list: list[int], limit:
 
 def calculate_pairs(pc: int, primes_list: list[int], output_key: str, output_dict: dict):
     print(f"{current_process().name} start")
+    # print(f"{current_thread().name} start")
     sub_prs = []
     manager = Manager()
     sub_prime_pairs = manager.list()
     sub_mut_prime_pairs = manager.list()
+    # sub_prime_pairs = []
+    # sub_mut_prime_pairs = []
     part_pc = (pc - 2) // NUMBER_SUBPROCESSES
     add_parts = (pc - 2) % NUMBER_SUBPROCESSES
     start_deff = 1
@@ -216,11 +225,13 @@ def calculate_pairs(pc: int, primes_list: list[int], output_key: str, output_dic
         sub_arr_pairs = [(d, pc - d, pc, pc + d) for d in range(start_deff, end_deff)]
         start_deff = end_deff
 
+        # prime_pr = Thread(
         prime_pr = Process(
             target=calculate_prime_pairs,
             name=f"{output_key} {i + 1} prime pares subprocess",
             args=(sub_arr_pairs, primes_list, sub_prime_pairs)
         )
+        # mut_prime_pr = Thread(
         mut_prime_pr = Process(
             target=calculate_mut_prime_pairs,
             name=f"{output_key} {i + 1} mutually prime pares subprocess",
@@ -246,12 +257,16 @@ def calculate_pairs(pc: int, primes_list: list[int], output_key: str, output_dic
     )
     mut_prime_limited = collect_mut_prime_pairs(mut_prime_concat, primes_list, LIMIT_OUTPUT_PAIRS)
 
-    mut_prime_nums = collect_mut_prime_nums(mut_prime_concat, primes_list, LIMIT_MUTUALLY_PRIMES)
+    mut_prime_nums = collect_mut_prime_nums(
+        mut_prime_concat, primes_list,
+        LIMIT_SELECTED_MUTUALLY_PRIMES
+    )
 
     output_dict[f"{output_key}_pp"] = (len(prime_concat), prime_limited)
     output_dict[f"{output_key}_mpp"] = (len(mut_prime_concat), mut_prime_limited)
     output_dict[f"{output_key}_mpn"] = mut_prime_nums
     print(f"{current_process().name} end")
+    # print(f"{current_thread().name} end")
 
 
 def save_results(
@@ -307,9 +322,13 @@ def save_results(
         str_m = '*'.join(map(lambda m: f"{m[0]}^{m[1]}", number[2].items()))
         saving_data.append((number[0], number[1], str_m))
 
-    with open("output4.csv", "w+", newline='') as csv_file:
-        writer = csv.writer(csv_file, delimiter=";")
-        writer.writerows(saving_data)
+    try:
+        with open("output4.csv", "w+", newline='') as csv_file:
+            writer = csv.writer(csv_file, delimiter=";")
+            writer.writerows(saving_data)
+    except PermissionError as perm:
+        print(f"Доступ к файлу output4.csv запрещён.\n{perm}")
+        sys.exit(ERROR_CODE)
 
 
 if __name__ == '__main__':
@@ -324,21 +343,24 @@ if __name__ == '__main__':
             dd = reading_data["DD"]
             mm = reading_data["MM"]
             yyyy = reading_data["YYYY"]
-    except FileNotFoundError:
+    except FileNotFoundError as fnf:
+        print(f"Файл input.json не найден.\n{fnf}")
         sys.exit(ERROR_CODE)
     pc2 = pow(2, 12 + n) if n <= 6 else pow(2, 25 - n)
     pc3 = pow(3, 7 + ns) if (ns := (n + mm + dd) % 7) > 3 else pow(3, 13 - ns)
     # pc2 = pow(2, 24)
     # pc3 = pow(3, 13)
     limit_primes = collect_prime_numbers(max(pc2, pc3) * 2)
-    # t = datetime.now()
 
     result_dict = Manager().dict()
+    # result_dict = {}
     # calculate_pairs(100, limit_primes, '100', result_dict)
+    # pc2_pr = Thread(
     pc2_pr = Process(
         target=calculate_pairs, name="pc2 process",
         args=(pc2, limit_primes, 'pc2', result_dict)
     )
+    # pc3_pr = Thread(
     pc3_pr = Process(
         target=calculate_pairs, name="pc3 process",
         args=(pc3, limit_primes, 'pc3', result_dict)
@@ -349,13 +371,10 @@ if __name__ == '__main__':
     pc2_pr.join()
     pc3_pr.join()
 
-    # print(datetime.now() - t)
-
     save_results(
         pc2, result_dict["pc2_pp"][0], result_dict["pc2_mpp"][0],
         result_dict["pc2_pp"][1], result_dict["pc2_mpp"][1], result_dict["pc2_mpn"],
         pc3, result_dict["pc3_pp"][0], result_dict["pc3_mpp"][0],
         result_dict["pc3_pp"][1], result_dict["pc3_mpp"][1], result_dict["pc3_mpn"]
     )
-
     print("\nSUCCESS")
